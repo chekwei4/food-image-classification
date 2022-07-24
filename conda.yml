@@ -1,0 +1,14 @@
+name: assignment7
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - pip=19.0.3
+  - python=3.6.7
+  - numpy=1.19.2
+  - Pillow
+  - pip:
+    - polyaxon-cli==0.5.6
+    - tensorflow
+    - flask
+    - waitress

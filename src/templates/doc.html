@@ -1,0 +1,159 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>README.md</title><style></style></head><body id="preview">
+<h1 class="code-line" data-line-start=0 data-line-end=1><a id="Tensorfood_App_0"></a>Tensorfood App</h1>
+<p class="has-line-data" data-line-start="1" data-line-end="2">A simple web application that aims to read a food image and accurately predict its food category (among 12 different Singaporean food).</p>
+<h1 class="code-line" data-line-start=3 data-line-end=4><a id="Introduction_3"></a>Introduction</h1>
+<p class="has-line-data" data-line-start="4" data-line-end="5">The goal of the project is to predict if a picture is one of 12 Singaporean food: 🦀chilli crab, 🥟curry puff, 🍤dim sum, 🍧ice kacang, 🥪kaya toast, 🍚nasi ayam, 🌯popiah, 🥞roti prata, 🐠sambal stingray, 🍢satay, 🍵tau huay or 🍜wanton noodle.</p>
+<p class="has-line-data" data-line-start="6" data-line-end="7">A CNN model was built using the <code>tensorflow.keras</code> framework and making use of an existing pre-trained network and transfer learning.</p>
+<h1 class="code-line" data-line-start=8 data-line-end=9><a id="Instruction_8"></a>Instruction</h1>
+
+<p><img src="/images/home.png"></p>
+
+<p class="has-line-data" data-line-start="11" data-line-end="12">Above is the <code>home.html</code> landing page. A user can choose to upload his/her own food picture and click the “Upload” button.</p>
+
+<p><img src="/images/prediction.png"></p>
+
+<p class="has-line-data" data-line-start="16" data-line-end="17">Above is the <code>prediction.html</code> page, which will then display the predicted food label, and the prediction probability.</p>
+<p class="has-line-data" data-line-start="18" data-line-end="19">There is also <code>info.html</code> and <code>data.html</code> which the user can explore to learn more about the project.</p>
+<p class="has-line-data" data-line-start="20" data-line-end="21">Note: The web app only allows <code>.png</code>, <code>.jpeg</code> and <code>jpg</code> file formats.</p>
+<p class="has-line-data" data-line-start="22" data-line-end="23">Disclaimer: Apologies for the overly simple web GUI as it was a quick-and-dirty app built and focus mainly on functionality and productionization.</p>
+<h1 class="code-line" data-line-start=24 data-line-end=25><a id="Technology_and_Resources_24"></a>Technology and Resources</h1>
+<p class="has-line-data" data-line-start="25" data-line-end="27">Python version: 3.6<br>
+Packages: pandas, numpy, tensorflow, flask, pytest, polyaxon (for experiments and hosting of trained model), docker (for clean and friendly productionization)</p>
+<h1 class="code-line" data-line-start=28 data-line-end=29><a id="File_Structure_28"></a>File Structure</h1>
+<pre><code class="has-line-data" data-line-start="30" data-line-end="52">.
+├── Dockerfile
+├── README.md
+├── ci
+│   └── myapp
+│       ├── Chart.yaml
+│       ├── templates
+│       └── values.yaml
+├── conda.yml
+├── env.sh
+├── skaffold.yaml
+├── src
+│   ├── app.py
+│   ├── inference.py
+│   └── templates
+│       ├── data.html
+│       ├── home.html
+│       ├── info.html
+│       └── predict.html
+└── tests
+    └── test_inference.py
+</code></pre>
+<p class="has-line-data" data-line-start="53" data-line-end="58">Brief desc:<br>
+<code>/src</code> : contains python codes to run app<br>
+<code>/src/templates</code> : contains html files for web browser<br>
+<code>/tests</code> : test codes under pytest package<br>
+<code>/ci</code> : required for AISG’s CI/CD pipeline</p>
+<h1 class="code-line" data-line-start=59 data-line-end=60><a id="Model_59"></a>Model</h1>
+<h2 class="code-line" data-line-start=60 data-line-end=61><a id="Transfer_Learning_60"></a>Transfer Learning</h2>
+<p class="has-line-data" data-line-start="61" data-line-end="62">Different structures of CNN models were experimented to determine the one that produces the optimal accuracy. Eventually, the base model finalised was <strong>MobileNetV2</strong>. Several fully-connected layers and dropouts were also implemented on top of the pre-trained model.</p>
+<h2 class="code-line" data-line-start=63 data-line-end=64><a id="Architecture_63"></a>Architecture</h2>
+<p class="has-line-data" data-line-start="64" data-line-end="65">Below is the full architecture of the model:</p>
+<pre><code class="has-line-data" data-line-start="67" data-line-end="93" class="language-Model:">_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+_________________________________________________________________
+mobilenetv2_1.00_224 (Functi (None, 7, 7, 1280)        2257984   
+_________________________________________________________________
+global_average_pooling2d_1 ( (None, 1280)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 500)               640500    
+_________________________________________________________________
+dropout_2 (Dropout)          (None, 500)               0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 250)               125250    
+_________________________________________________________________
+dropout_3 (Dropout)          (None, 250)               0         
+_________________________________________________________________
+dense_3 (Dense)              (None, 125)               31375     
+_________________________________________________________________
+dropout_4 (Dropout)          (None, 125)               0         
+_________________________________________________________________
+dense_4 (Dense)              (None, 12)                1512      
+_________________________________________________________________
+Total params: 3,056,621
+Trainable params: 798,637
+Non-trainable params: 2,257,984
+_________________________________________________________________
+</code></pre>
+<h1 class="code-line" data-line-start=96 data-line-end=97><a id="Data_96"></a>Data</h1>
+<p class="has-line-data" data-line-start="97" data-line-end="98">This project explored a dataset consisting of 12 classes of Singaporean food, with about 100 images in each class.</p>
+<h2 class="code-line" data-line-start=99 data-line-end=100><a id="Train_Test_Val_99"></a>Train, Test, Val</h2>
+<ul>
+<li class="has-line-data" data-line-start="100" data-line-end="101">80% (975) was used as training set</li>
+<li class="has-line-data" data-line-start="101" data-line-end="102">10% (120) was used as validation set</li>
+<li class="has-line-data" data-line-start="102" data-line-end="104">10% (129) was used as unseen testing set</li>
+</ul>
+<p class="has-line-data" data-line-start="104" data-line-end="106">Below is a class distribution of training dataset<br>
+
+
+<p><img src="/images/training_data.png"></p>
+
+<p class="has-line-data" data-line-start="107" data-line-end="108">Download the 280mb dataset <a href="https://aiapstorage1.blob.core.windows.net/datasets/tensorfood.tar.gz.">here</a></p>
+<h2 class="code-line" data-line-start=110 data-line-end=111><a id="Data_Preprocessing_110"></a>Data Preprocessing</h2>
+<p class="has-line-data" data-line-start="111" data-line-end="112">Preprocessing was done on the images via <code>ImageDataGenerator</code> before feeding into model training and predictions.</p>
+<ul>
+<li class="has-line-data" data-line-start="112" data-line-end="113"><code>rescale = 1./255</code></li>
+<li class="has-line-data" data-line-start="113" data-line-end="114"><code>shear_range = 0.2</code></li>
+<li class="has-line-data" data-line-start="114" data-line-end="115"><code>zoom_range = 0.2</code></li>
+<li class="has-line-data" data-line-start="115" data-line-end="117"><code>horizontal_flip = True</code></li>
+</ul>
+<h1 class="code-line" data-line-start=117 data-line-end=118><a id="Performance_117"></a>Performance</h1>
+<h2 class="code-line" data-line-start=118 data-line-end=119><a id="Train_Performance_118"></a>Train Performance</h2>
+<p class="has-line-data" data-line-start="119" data-line-end="120">Model training was done on 100 epochs, with early callback implemented on <code>monitor=val_accuracy</code> and <code>patience=10</code>. The model eventually stopped training after 25 epochs.</p>
+<p class="has-line-data" data-line-start="121" data-line-end="122">Below shows the training/validation accuracy:</p>
+
+
+<p><img src="/images/acc_loss.png"></p>
+
+<h2 class="code-line" data-line-start=126 data-line-end=127><a id="Test_Performance_126"></a>Test Performance</h2>
+<p class="has-line-data" data-line-start="127" data-line-end="128">Test accuracy stands at <strong>0.95</strong>, with <strong>6/129</strong> wrong predictions.</p>
+<p class="has-line-data" data-line-start="129" data-line-end="130">Below is a confusion matrix on test dataset results, showing 6 wrong predictions:</p>
+
+<p><img src="/images/val_results.png"></p>
+
+<p class="has-line-data" data-line-start="133" data-line-end="134">Below provides more details on the missed predictions:</p>
+
+<p><img src="/images/wrong_pred1.png"></p>
+<p><img src="/images/wrong_pred2.png"></p>
+<p><img src="/images/wrong_pred3.png"></p>
+
+<h1 class="code-line" data-line-start=141 data-line-end=142><a id="Productionization_and_Deployment_141"></a>Productionization and Deployment</h1>
+<p class="has-line-data" data-line-start="142" data-line-end="143">Flask is used in this project to create a quick web-based application for users to interface with the model.</p>
+<p class="has-line-data" data-line-start="144" data-line-end="145">The web app is then dockerized into an iamge, and the container is mounted and now running on AISG’s registry.</p>
+<h2 class="code-line" data-line-start=146 data-line-end=147><a id="CICD_146"></a>CI/CD</h2>
+<p class="has-line-data" data-line-start="147" data-line-end="149">CI/CD is a method to frequently push upgrades/modifications/changes to production environment by introducing automation into the stages of app development.<br>
+The main concepts attributed to CI/CD are continuous integration, continuous delivery and continuous deployment.</p>
+<p class="has-line-data" data-line-start="150" data-line-end="151">Successful <strong>continuous integration</strong> means new code changes to an app are regularly built, tested, and merged to a shared repository. It’s a solution to the problem of having too many branches of an app in development at once that might conflict with each other.</p>
+<p class="has-line-data" data-line-start="152" data-line-end="153"><strong>Continuous deployment</strong> (or sometimes known as <strong>continuous delivery</strong> and used interchangeably) means that any changes made by the developer are automatically tested, bug-free, approved by QA and signed off, and push to production repository and ready for live production deployment.</p>
+<p class="has-line-data" data-line-start="154" data-line-end="155">Traditionally, a production deployment could only take place during off-peak hours or weekends. With good CI/CD in-placed, it now takes minimal effort to deploy new code.</p>
+
+<p><img src="/images/ci-cd.png"></p>
+
+<h2 class="code-line" data-line-start=158 data-line-end=159><a id="Docker_Image_Containers_158"></a>Docker, Image, Containers</h2>
+<p class="has-line-data" data-line-start="159" data-line-end="161">The “Build once, run anywhere” mantra.<br>
+By using dockers, we are able to reproduce the environment required for the web app to run in the same manner, and in multiple environemnts (eg. local, production, QA).</p>
+<p class="has-line-data" data-line-start="162" data-line-end="163">A docker image is a akin a template, or a set of instructions which tells the container how it should be created. A docker image can also be thought of as a class definition, while a container is an isntance of that class. Once a class definition (a docker image) is defined, we can create many instances of that class (spins out many docker containers).</p>
+<p class="has-line-data" data-line-start="164" data-line-end="166">When a docker image runs, it creates a docker container.<br>
+The container used in this project helps us to package an application with all of the parts it needs, such as libraries and dependencies, and deploy it as one package.</p>
+<p class="has-line-data" data-line-start="167" data-line-end="169">To build the docker file locally<br>
+<code>docker build . -t tensorfood</code></p>
+<p class="has-line-data" data-line-start="170" data-line-end="172">To run docker<br>
+<code>docker run -it -d tensorfood</code></p>
+<p class="has-line-data" data-line-start="173" data-line-end="175">To see if container is running fine<br>
+<code>docker ps</code></p>
+<h1 class="code-line" data-line-start=177 data-line-end=178><a id="Future_Works_177"></a>Future Works</h1>
+<ol>
+<li class="has-line-data" data-line-start="178" data-line-end="179">To improve on web app’s UI/UX</li>
+<li class="has-line-data" data-line-start="179" data-line-end="180">To experiment with different other model architectures</li>
+<li class="has-line-data" data-line-start="180" data-line-end="182">To scale and train model with more than 12 classes of Singapore food</li>
+</ol>
+<h1 class="code-line" data-line-start=182 data-line-end=183><a id="References_182"></a>References</h1>
+<p class="has-line-data" data-line-start="183" data-line-end="186"><a href="https://www.edureka.co/blog/docker-commands/">https://www.edureka.co/blog/docker-commands/</a><br>
+<a href="https://pythonbasics.org/what-is-flask-python/">https://pythonbasics.org/what-is-flask-python/</a><br>
+<a href="https://www.redhat.com/en/topics/devops/what-is-ci-cd">https://www.redhat.com/en/topics/devops/what-is-ci-cd</a></p>
+<h1 class="code-line" data-line-start=188 data-line-end=189><a id="Credits_188"></a>Credits</h1>
+<p class="has-line-data" data-line-start="189" data-line-end="190">Deon, Andy, Kah Ghi, Wei Ming, Yu Yang, David, and all who have helped and guided me through this assignment.</p>
+</body></html>
