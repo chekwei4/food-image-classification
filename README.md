@@ -105,7 +105,7 @@ This project explored a dataset consisting of 12 classes of Singaporean food, wi
 Below is a class distribution of training dataset
 <img src="src/images/training_data.png" width="100%">
 
-Download the 280mb dataset [here](https://aiapstorage1.blob.core.windows.net/datasets/tensorfood.tar.gz.)
+Download the 280mb dataset [here]()
 
 
 ## Data Preprocessing
@@ -188,6 +188,3 @@ https://pythonbasics.org/what-is-flask-python/
 
 https://www.redhat.com/en/topics/devops/what-is-ci-cd/
 
-
-# Credits
-Deon, Andy, Kah Ghi, Wei Ming, Yu Yang, David, and all who have helped and guided me through this assignment 🍔
